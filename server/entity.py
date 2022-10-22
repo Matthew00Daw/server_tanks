@@ -24,6 +24,13 @@ class DeathCause(Enum):
     COLLISION = 2
     INCIDENT = 3
 
+class TankState(Enum):
+    NORMAL = 1
+    DEAD = 2
+    SPAWNING = 3
+    DROWNING = 4
+    EXPLODING = 5
+
 
 class TankEntity:
 
@@ -31,6 +38,7 @@ class TankEntity:
         self.position = position
         self.direction = direction
         self.level = level
+        self.state = TankState.DEAD
 
     def shot(self):
         """
@@ -63,4 +71,8 @@ class TankEntity:
         self.direction = new_direction
 
     def kill(self, killer, death_reason):
+        self.state = TankState.DEAD
 
+    def respawn(self, position):
+        self.position = position
+        self.state = TankState.SPAWNING

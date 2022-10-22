@@ -34,7 +34,9 @@ async def main():
         await server.serve_forever()
 
 
+
 if __name__ == "__main__" and os.name == "nt":
     # server = Server(25565)
     asyncio.run(main())
+
     print("death!")
