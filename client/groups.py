@@ -3,7 +3,7 @@ from typing import List, Any, Tuple
 import pygame as pg
 import numpy as np
 
-from sprites import Block, TankSprite
+from client.sprites import Block, TankSprite
 
 class CompositeGroup(pg.sprite.Group):
     

@@ -11,24 +11,21 @@ class ActionType(Enum):
     MOVE_DOWN = 4
     FIRE = 5
 
-
 class PackageType(Enum):
     COMMAND = 1
     ACTION = 2
     REQUEST = 3
 
 
-class CommandType(Enum):
+class CommandType(Enum): 
     CONNECT = 1
     DISCONNECT = 2
     RESPAWN = 3
-
-
+    
 class RequestType(Enum):
     POSITIONS = 1
     GAME_STATE = 2
     LEVEL_DESTRUCTION = 3
-
 
 class ErrorType(Enum):
     NO_ERROR = 0
@@ -61,9 +58,8 @@ class NetworkPackageBuilder:
     def build(self):
         return struct.pack("!BBB", self.package_type, self.action_type, self.data_length) + self.data
 
-
 class PackageManager:
-
+    
     def __init__(self, client_info):
         self.info = client_info
         pass
@@ -76,7 +72,7 @@ class PackageManager:
         return struct.pack(format + "BB", value, PackageType.REQUEST.value, type.value)
 
     def make_command(self, type: CommandType, data):
-        data = data.encode() + bytes(10 - len(data))
+        data = data.encode() + bytes(10-len(data))
         format, value = self.make_header()
         return struct.pack(format + "BB10s", value, PackageType.COMMAND.value, type.value, data)
 

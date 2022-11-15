@@ -5,14 +5,11 @@ from random import randint
 from typing import Tuple, List, Union
 from enum import Enum
 
-from common.package import NetworkPackageBuilder
-from common.network import PackageType, CommandType, ActionType, RequestType
-
+from common.package import NetworkPackageBuilder, PackageType, CommandType, ActionType, RequestType
 
 class PlayerState(Enum):
     ALIVE = 1
     DEAD = 2
-
 
 class PlayerDirection(Enum):
     RIGHT = 1
@@ -20,20 +17,16 @@ class PlayerDirection(Enum):
     LEFT = 2
     DOWN = 4
 
-
 def singleton(cls):
     instances = {}
-
     def getinstance():
         if cls not in instances:
             instances[cls] = cls()
         return instances[cls]
-
     return getinstance
 
-
 class Player:
-
+    
     def __init__(self, nickname: str, position: Tuple[float, float]):
         self.nickname = nickname
         self.position = position
@@ -55,10 +48,9 @@ class Player:
         self.set_position(position)
         self.direction = direction
 
-
 @singleton
 class GameState:
-
+    
     def __init__(self):
         self.map_name = "Unknown"
         self.start_timestamp = None
@@ -72,7 +64,7 @@ class GameState:
 
     def deserialize(self):
         name = self.map_name.encode() + bytes(10 - len(self.map_name))
-        return struct.pack("!10sI", self.map_name, int(time.time() - self.start_timestamp))
+        return struct.pack("!10sI", self.map_name, int(time.time()-self.start_timestamp))
 
     def add_player(self, player: Player):
         self.players.append(player)
@@ -81,10 +73,9 @@ class GameState:
         self.players.remove(player)
 
     def deserialize_players(self, exclude: str):
-        retval = struct.pack("B", len(self.players) - 1) + b''. \
+        retval = struct.pack("B", len(self.players)-1) + b''.\
             join([player.deserialize() for player in self.players if player.nickname != exclude])
         return retval
-
 
 class ServerProtocol(asyncio.Protocol):
 
