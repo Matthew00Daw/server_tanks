@@ -4,16 +4,16 @@ from typing import Tuple
 
 import pygame as pg
 
-class TankSprite(pg.sprite.Sprite):
+from client.animationdirector import AnimationDirector
+from client.resourcemanager import ResourceManager
 
-    def __init__(self, nickname: str, position: Tuple[float, float]):
+class EntitySprite(pg.sprite.Sprite):
+
+    def __init__(self, nickname: str, position):
         super().__init__()
-        self.image = pg.image.load("C:\\users\\workstation2\\downloads\\sprite.png")
+        self.rect = pg.Rect(position, (32, 32))
         self.angle = 90
         self.nickname = nickname
-        self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = position
-        self.animation_timer = 0
         self.is_alive = False
 
     def update(self, data):
@@ -34,15 +34,28 @@ class TankSprite(pg.sprite.Sprite):
     def get_position(self) -> Tuple[int, int]:
         return self.rect.x, self.rect.y
 
+class TankSprite(EntitySprite):
 
-class PlayerTank(TankSprite):
+    def __init__(self, nickname: str, position: Tuple[float, float]):
+        super().__init__(nickname, position)
+        self.image = ResourceManager().get_tile_for("Tank")
+
+class PlayerTank(EntitySprite):
 
     def __init__(self, position):
         super().__init__("Вы", position)
-        self.key_pressed = None
+        self.animation_director = AnimationDirector(ResourceManager().get_animation_tilemap_for("Tank"))
+        self.key_pressed = 0
         self.last_state = self.rect.x, self.rect.y
         self.speed = 0.15
 
+    @property
+    def image(self):
+        return self.animation_director.get_image()
+
+    @image.setter
+    def set_image(self, image):
+        pass
 
     def handle_input(self, event):
         if event.type == pg.KEYDOWN:
@@ -56,7 +69,7 @@ class PlayerTank(TankSprite):
         return self.key_pressed != 0
 
     def update(self, delta_time: int):
-        self.animation_timer += delta_time
+        self.animation_director.update(delta_time)
         self.last_state = self.rect.x, self.rect.y
         if self.key_pressed == pg.K_w:
             self.move_stuff(90, delta_time)
@@ -76,7 +89,7 @@ class PlayerTank(TankSprite):
 
     def rotation_stuff(self, desired_angle):
         if self.angle != desired_angle:
-                self.image = pg.transform.rotate(self.image, desired_angle-self.angle)
+                self.animation_director.set_rotation(desired_angle-90)
                 self.angle = desired_angle
 
     def move_stuff(self, desired_angle, delta_time):

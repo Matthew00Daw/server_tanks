@@ -1,81 +1,11 @@
 import asyncio
 import struct
-import time
 from random import randint
-from typing import Tuple, List, Union
-from enum import Enum
+from typing import Union
 
+from server.player import Player, PlayerDirection
+from server.gamestate import GameState
 from common.package import NetworkPackageBuilder, PackageType, CommandType, ActionType, RequestType
-
-class PlayerState(Enum):
-    ALIVE = 1
-    DEAD = 2
-
-class PlayerDirection(Enum):
-    RIGHT = 1
-    UP = 3
-    LEFT = 2
-    DOWN = 4
-
-def singleton(cls):
-    instances = {}
-    def getinstance():
-        if cls not in instances:
-            instances[cls] = cls()
-        return instances[cls]
-    return getinstance
-
-class Player:
-    
-    def __init__(self, nickname: str, position: Tuple[float, float]):
-        self.nickname = nickname
-        self.position = position
-        self.state = PlayerState.DEAD
-        self.direction = PlayerDirection.UP
-
-    def deserialize(self):
-        nickname = self.nickname.encode() + bytes(10 - len(self.nickname))
-        retval = struct.pack("!10sffBB", nickname, *self.position, self.state.value, self.direction.value)
-        return retval
-
-    def set_state(self, state: PlayerState):
-        self.state = state
-
-    def set_position(self, position: Tuple[float, float]):
-        self.position = position
-
-    def move(self, position: Tuple[float, float], direction: PlayerDirection):
-        self.set_position(position)
-        self.direction = direction
-
-@singleton
-class GameState:
-    
-    def __init__(self):
-        self.map_name = "Unknown"
-        self.start_timestamp = None
-        self.players: List[Player] = []
-
-    def in_work(self):
-        return bool(self.start_timestamp)
-
-    def start(self):
-        self.start_timestamp = time.time()
-
-    def deserialize(self):
-        name = self.map_name.encode() + bytes(10 - len(self.map_name))
-        return struct.pack("!10sI", self.map_name, int(time.time()-self.start_timestamp))
-
-    def add_player(self, player: Player):
-        self.players.append(player)
-
-    def remove_player(self, player: Player):
-        self.players.remove(player)
-
-    def deserialize_players(self, exclude: str):
-        retval = struct.pack("B", len(self.players)-1) + b''.\
-            join([player.deserialize() for player in self.players if player.nickname != exclude])
-        return retval
 
 class ServerProtocol(asyncio.Protocol):
 
@@ -171,19 +101,3 @@ class ServerProtocol(asyncio.Protocol):
             self.handle_command(packet, action, data[3:])
         elif packet == PackageType.REQUEST:
             self.handle_request(packet, action, data[3:])
-
-
-async def main():
-    # Get a reference to the event loop as we plan to use
-    # low-level APIs.
-    loop = asyncio.get_running_loop()
-
-    server = await loop.create_server(
-        lambda: ServerProtocol(),
-        '127.0.0.1', 8888)
-
-    async with server:
-        await server.serve_forever()
-
-
-asyncio.run(main())

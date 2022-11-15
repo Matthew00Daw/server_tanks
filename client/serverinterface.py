@@ -4,12 +4,16 @@ from typing import Tuple
 
 from common.package import NetworkPackageBuilder, PackageType, CommandType, RequestType, ActionType
 
+
+class NotAuthorizedException(Exception):
+    pass
+
 def connection_reqired(func):
     def wrapper(self, *args, **kwargs):
         if self.connected():
             return func(self, *args, **kwargs)
         else:
-            raise Exception("Попытка обратиться к серверу до установления подключения!")
+            raise NotAuthorizedException("Попытка обратиться к серверу до установления подключения!")
     return wrapper
 
 class ServerInterface:

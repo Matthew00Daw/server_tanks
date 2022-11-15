@@ -80,7 +80,7 @@ class MenuGameState(GameState):
             self.game.server = ServerInterface(self.ip_entry.get_text(), int(self.port_entry.get_text()))
             self.game.server.connect(self.nickname_entry.get_text())
             self.game.set_state(InGameState(self.game))
-        except:
+        except (ConnectionRefusedError, TimeoutError) as e:
             pggui.windows.UIMessageWindow(pg.Rect((300-50, 200), (300, 200)),
                                           "Не удалось подключиться к серверу.",
                                           manager=self.manager, window_title="Ошибка",

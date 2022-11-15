@@ -1,0 +1,6 @@
+[project]
+name = "tanks"
+version = "0.1.0"
+dependencies = ["pytest", "pygame", "pygame_gui", "numpy", "pytest-asyncio"]
+[tool.setuptools.packages.find]
+where=["."]
