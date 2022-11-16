@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 import pygame as pg
 
@@ -36,7 +36,8 @@ class TileMap:
 
 class NestedTileMap(TileMap):
     
-    def __init__(self, tilemap: TileMap, selection: slice):
+    def __init__(self, tilemap: TileMap, selection: list):
+
         self.dimentions = tilemap.dimentions
         self.tile_dimentions: Tuple[int, int] = tilemap.get_tile_dimentions()
-        self.tiles: List[pg.surface.Surface] = tilemap.tiles[selection]
+        self.tiles: List[pg.surface.Surface] = [tilemap.tiles[idx] for idx in selection]

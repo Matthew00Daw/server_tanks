@@ -7,6 +7,12 @@ TILEMAP_PATH = "resources\\tanks_sheet.png"
 TILEMAP_DIMS = (8, 4)
 
 
+class ResourceException(Exception):
+
+    def __init__(self):
+        super().__init__(msg="No such resource")
+
+
 @singleton
 class ResourceManager:
     
@@ -19,9 +25,11 @@ class ResourceManager:
         elif idx == "Bullet":
             return self.root_tilemap.get_tile(20)
         else:
-            raise Exception("No such resource")
+            raise ResourceException()
 
     def get_animation_tilemap_for(self, idx: str) -> TileMap:
         if idx == "Tank":
-            return NestedTileMap(self.root_tilemap, slice(1, 8))
+            return NestedTileMap(self.root_tilemap, 7*[1] + list(range(1, 9)))
+        else:
+            raise ResourceException()
         

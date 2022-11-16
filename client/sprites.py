@@ -44,7 +44,7 @@ class PlayerTank(EntitySprite):
 
     def __init__(self, position):
         super().__init__("Вы", position)
-        self.animation_director = AnimationDirector(ResourceManager().get_animation_tilemap_for("Tank"))
+        self.animation_director = AnimationDirector(ResourceManager().get_animation_tilemap_for("Tank"), True)
         self.key_pressed = 0
         self.last_state = self.rect.x, self.rect.y
         self.speed = 0.15
