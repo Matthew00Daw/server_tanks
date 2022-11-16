@@ -2,6 +2,7 @@ import asyncio
 import struct
 from random import randint
 from typing import Union
+from logging import Logger, DEBUG
 
 from server.player import Player, PlayerDirection
 from server.gamestate import GameState
@@ -10,6 +11,7 @@ from common.package import NetworkPackageBuilder, PackageType, CommandType, Acti
 class ServerProtocol(asyncio.Protocol):
 
     def __init__(self):
+        self.logger = Logger(__name__, level=DEBUG)
         self.gs = GameState()
         self.message_n = 0
         self.player: Union[Player, None] = None
@@ -35,10 +37,13 @@ class ServerProtocol(asyncio.Protocol):
         self.player.set_position((randint(0, 600), randint(0, 400)))
 
     def disconnect_player(self):
-        self.gs.remove_player(self.player)
-        self.player = None
-        peername = self.transport.get_extra_info('peername')
-        print('Connection with {} closed'.format(peername))
+        if self.player is not None:
+            self.gs.remove_player(self.player)
+            self.player = None
+            peername = self.transport.get_extra_info('peername')
+            print('Connection with {} closed'.format(peername))
+        else:
+            self.logger.warning("Trying to disconnect already disconnected player!")
 
     def handle_action(self, packet, action, data):
         action = ActionType(action)

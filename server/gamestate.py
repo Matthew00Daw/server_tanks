@@ -13,6 +13,8 @@ class GameState:
         self.map_name = "Unknown"
         self.start_timestamp = None
         self.players: List[Player] = []
+        # self.projectiles = List[Projectile] = []
+        self.level = None
 
     def in_work(self):
         return bool(self.start_timestamp)

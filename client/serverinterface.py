@@ -38,13 +38,13 @@ class ServerInterface:
     def connected(self):
         return self.is_connected
     
-    @connection_reqired
     def disconnect(self) -> None:
         builder = NetworkPackageBuilder()
         builder.set_package(PackageType.COMMAND)
         builder.set_action(CommandType.DISCONNECT)
         self.s.sendall(builder.build())
         self.s.recv(256)
+        self.is_connected = False
 
     @connection_reqired
     def send_position(self, position, direction):

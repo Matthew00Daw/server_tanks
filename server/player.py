@@ -20,6 +20,7 @@ class Player:
     def __init__(self, nickname: str, position: Tuple[float, float]):
         self.nickname = nickname
         self.position = position
+        self.speed = 0
         self.state = PlayerState.DEAD
         self.direction = PlayerDirection.UP
 
